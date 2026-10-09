@@ -1,8 +1,7 @@
-name: Vérification initiale du contrat
+name: Vérification manuelle du contrat
 
+# Déclenchement manuel uniquement : pas de tests à chaque push.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -18,6 +17,5 @@ jobs:
       - name: Vérifier les exemples et la configuration
         run: python -m unittest discover -s tests -v
 
-# Ce workflow ne collecte rien et n'envoie aucun e-mail.
-# L'automatisation de la veille (toutes les 12h) sera créée après validation
-# des scripts et des autorisations d'accès nécessaires.
+# À utiliser uniquement après validation du groupe.
+# Aucun collecteur RSS/API ni envoi d'e-mails n'est lancé par ce workflow.
