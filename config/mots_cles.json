@@ -1,0 +1,10 @@
+{
+  "statut": "A_REMETTRE_EN_PLENIERE",
+  "commentaire": "Chaque membre propose questions de veille, mots-clés FR/EN, équations booléennes et exclusions. Configuration finale à valider collectivement.",
+  "axes": {
+    "MARCHES_FINANCIERS": [],
+    "REGLEMENTATION_CONFORMITE": [],
+    "CREDIT_MICROFINANCE": [],
+    "BANQUE": []
+  }
+}

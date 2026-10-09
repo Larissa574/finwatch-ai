@@ -1,0 +1,71 @@
+{
+  "description": "Catalogue de onze sources sélectionnées ; aucune connexion automatisée n'est déclarée opérationnelle.",
+  "sources": [
+    {
+      "nom": "arXiv",
+      "methode_envisagee": "API",
+      "priorite": "PREMIERE_PHASE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "BRI / BIS",
+      "methode_envisagee": "RSS",
+      "priorite": "PREMIERE_PHASE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "BCE — Supervision bancaire",
+      "methode_envisagee": "RSS",
+      "priorite": "PREMIERE_PHASE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "FMI",
+      "methode_envisagee": "RSS / publications",
+      "priorite": "PHASE_SUIVANTE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "Springer Nature",
+      "methode_envisagee": "API de métadonnées (clé nécessaire)",
+      "priorite": "PHASE_SUIVANTE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "OCDE",
+      "methode_envisagee": "Alertes ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "EBA",
+      "methode_envisagee": "RSS ou alertes ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "IOSCO / OICV",
+      "methode_envisagee": "Alertes ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "CGAP",
+      "methode_envisagee": "Alertes ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "BCEAO",
+      "methode_envisagee": "Alertes officielles ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    },
+    {
+      "nom": "AMF-UMOA",
+      "methode_envisagee": "RSS ou alertes ciblées",
+      "priorite": "CATALOGUE",
+      "statut": "A_TESTER"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+*credentials*.json
+*service-account*.json
+token.json
+*.pem
+*.key
+
+# Données collectées en local
+data/
+*.sqlite
+*.db
+
+# Éditeurs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

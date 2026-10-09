@@ -1,0 +1,23 @@
+name: Vérification initiale du contrat
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  contrat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer les fichiers
+        uses: actions/checkout@v4
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Vérifier les exemples et la configuration
+        run: python -m unittest discover -s tests -v
+
+# Ce workflow ne collecte rien et n'envoie aucun e-mail.
+# L'automatisation de la veille (toutes les 12h) sera créée après validation
+# des scripts et des autorisations d'accès nécessaires.
