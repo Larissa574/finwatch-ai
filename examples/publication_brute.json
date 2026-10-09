@@ -1,0 +1,11 @@
+{
+  "id": "exemple-001",
+  "titre": "Exemple de publication brute",
+  "source": "source_demo",
+  "url": "https://example.com/publication/exemple-001",
+  "date_publication": "2026-10-01",
+  "date_collecte": "2026-10-09T12:00:00Z",
+  "auteur": "FINWATCH AI",
+  "resume_original": "Exemple de contenu brut conforme au contrat.",
+  "type_document": "article"
+}
