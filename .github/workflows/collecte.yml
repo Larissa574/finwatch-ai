@@ -1,0 +1,45 @@
+name: FINWATCH AI - Collecte
+
+# Test manuel uniquement : la planification sera activee apres l'historique persistant
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collecte:
+    name: Tester la collecte
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Recuperer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Installer les dependances
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install requests feedparser
+
+      - name: Collecter les publications
+        run: python src/collecte.py
+
+      - name: Verifier les resultats
+        run: |
+          python -c "import json; from pathlib import Path; d=Path('data/collecte'); h=json.loads((d/'publications.json').read_text(encoding='utf-8')); n=json.loads((d/'nouvelles_publications.json').read_text(encoding='utf-8')); print('Historique :', len(h)); print('Nouveautes :', len(n))"
+
+      - name: Enregistrer les resultats
+        uses: actions/upload-artifact@v4
+        with:
+          name: finwatch-collecte
+          path: |
+            data/collecte/publications.json
+            data/collecte/nouvelles_publications.json
+          retention-days: 7
+          if-no-files-found: error
