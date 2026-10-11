@@ -7,7 +7,12 @@ import calendar
 
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
+from urllib.parse import (
+    urlsplit,
+    urlunsplit,
+    parse_qsl,
+    urlencode
+)
 
 
 # ==========================================
@@ -53,30 +58,57 @@ params_arxiv = {
 
 
 # ==========================================
-# 2. FICHIER DE STOCKAGE
+# 2. CONFIGURATION DU STOCKAGE
 # ==========================================
 
 dossier = Path("data/collecte")
-fichier = dossier / "publications.json"
 
-dossier.mkdir(parents=True, exist_ok=True)
+fichier_historique = dossier / "publications.json"
 
-if fichier.exists():
-    with open(fichier, "r", encoding="utf-8") as f:
+fichier_nouvelles = (
+    dossier / "nouvelles_publications.json"
+)
+
+dossier.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+
+# ==========================================
+# 3. CHARGEMENT DE L'HISTORIQUE
+# ==========================================
+
+if fichier_historique.exists():
+
+    with open(
+        fichier_historique,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
         publications = json.load(f)
 
     if not isinstance(publications, list):
         raise ValueError(
-            "Le fichier JSON doit contenir une liste."
+            "L'historique doit contenir une liste JSON."
         )
+
 else:
     publications = []
 
-print("Publications deja enregistrees :", len(publications))
+
+# Liste des articles nouveaux uniquement
+nouvelles_publications = []
+
+print(
+    "Publications déjà enregistrées :",
+    len(publications)
+)
 
 
 # ==========================================
-# 3. FONCTIONS COMMUNES
+# 4. FONCTIONS UTILITAIRES
 # ==========================================
 
 def nettoyer_url(url):
@@ -84,9 +116,9 @@ def nettoyer_url(url):
     if not url:
         return None
 
-    morceaux = urlsplit(url)
+    morceaux = urlsplit(url.strip())
 
-    # Supprimer les parametres de suivi publicitaire
+    # Supprimer les paramètres publicitaires
     parametres = [
         (cle, valeur)
         for cle, valeur in parse_qsl(
@@ -97,8 +129,8 @@ def nettoyer_url(url):
     ]
 
     return urlunsplit((
-        morceaux.scheme,
-        morceaux.netloc,
+        morceaux.scheme.lower(),
+        morceaux.netloc.lower(),
         morceaux.path,
         urlencode(parametres),
         ""
@@ -114,7 +146,7 @@ def generer_id(url):
 
 def convertir_date(article):
 
-    # Cas particulier de la BRI
+    # Format particulier de la BRI
     date_bri = article.get("cb_publicationdate")
 
     if date_bri:
@@ -127,13 +159,14 @@ def convertir_date(article):
         except ValueError:
             pass
 
-    # Dates deja analysees par feedparser
+    # Dates standard des flux RSS et Atom
     date_parsee = (
         article.get("published_parsed")
         or article.get("updated_parsed")
     )
 
     if date_parsee:
+
         timestamp = calendar.timegm(date_parsee)
 
         return datetime.fromtimestamp(
@@ -149,6 +182,7 @@ def extraire_auteurs(article):
     noms = []
 
     for auteur in article.get("authors", []):
+
         nom = auteur.get("name")
 
         if nom:
@@ -157,14 +191,40 @@ def extraire_auteurs(article):
     return noms
 
 
-# Identifiants des articles deja enregistres
+def enregistrer_json(chemin, donnees):
+
+    # Écriture dans un fichier temporaire
+    temporaire = chemin.with_suffix(
+        chemin.suffix + ".tmp"
+    )
+
+    with open(
+        temporaire,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        json.dump(
+            donnees,
+            f,
+            ensure_ascii=False,
+            indent=4
+        )
+
+    # Remplacement du fichier précédent
+    temporaire.replace(chemin)
+
+
+# ==========================================
+# 5. IDENTIFIANTS DÉJÀ ENREGISTRÉS
+# ==========================================
+
 ids_existants = {
     article["id"]
     for article in publications
     if article.get("id")
 }
 
-# Pour reconnaitre aussi les anciennes URL
 urls_existantes = {
     nettoyer_url(article.get("url"))
     for article in publications
@@ -173,7 +233,7 @@ urls_existantes = {
 
 
 # ==========================================
-# 4. TRANSFORMER UNE PUBLICATION
+# 6. NORMALISER UNE PUBLICATION
 # ==========================================
 
 def ajouter_publication(entree, nom_source):
@@ -186,7 +246,7 @@ def ajouter_publication(entree, nom_source):
 
     identifiant = generer_id(lien)
 
-    # Verification des doublons
+    # Empêcher les doublons
     if (
         identifiant in ids_existants
         or lien in urls_existantes
@@ -197,6 +257,7 @@ def ajouter_publication(entree, nom_source):
         timezone.utc
     ).isoformat()
 
+    # Nos 9 champs contractuels
     article = {
         "id": identifiant,
         "titre": titre.strip(),
@@ -209,8 +270,13 @@ def ajouter_publication(entree, nom_source):
         "type_document": "publication"
     }
 
+    # Historique complet
     publications.append(article)
 
+    # Nouveautés de cette exécution
+    nouvelles_publications.append(article)
+
+    # Empêcher un second ajout
     ids_existants.add(identifiant)
     urls_existantes.add(lien)
 
@@ -218,7 +284,7 @@ def ajouter_publication(entree, nom_source):
 
 
 # ==========================================
-# 5. COLLECTE DES FLUX RSS
+# 7. COLLECTE RSS
 # ==========================================
 
 def collecter_rss(source):
@@ -239,30 +305,30 @@ def collecter_rss(source):
     flux = feedparser.parse(response.content)
 
     if not flux.get("version"):
-        print("Format RSS ou Atom non reconnu.")
+        print("Format RSS / Atom non reconnu.")
         return
 
     if flux.bozo:
-        print("Attention : anomalie XML.")
-        print("Detail :", flux.get("bozo_exception"))
+        print("Anomalie XML :", flux.get("bozo_exception"))
         return
 
     total = len(flux.entries)
     nouvelles = 0
 
     for entree in flux.entries:
+
         if ajouter_publication(
             entree,
             source["nom"]
         ):
             nouvelles += 1
 
-    print("Publications trouvees :", total)
+    print("Publications trouvées :", total)
     print("Nouvelles publications :", nouvelles)
 
 
 # ==========================================
-# 6. COLLECTE ARXIV
+# 8. COLLECTE API ARXIV
 # ==========================================
 
 def collecter_arxiv():
@@ -284,26 +350,30 @@ def collecter_arxiv():
     flux = feedparser.parse(response.content)
 
     if flux.get("version") != "atom10":
-        print("Reponse arXiv non reconnue.")
+        print("Format Atom non reconnu.")
         return
 
     if flux.bozo:
-        print("Anomalie XML arXiv.")
+        print("Anomalie XML :", flux.get("bozo_exception"))
         return
 
     total = len(flux.entries)
     nouvelles = 0
 
     for entree in flux.entries:
-        if ajouter_publication(entree, "arXiv"):
+
+        if ajouter_publication(
+            entree,
+            "arXiv"
+        ):
             nouvelles += 1
 
-    print("Publications trouvees :", total)
+    print("Publications trouvées :", total)
     print("Nouvelles publications :", nouvelles)
 
 
 # ==========================================
-# 7. LANCEMENT DE LA COLLECTE
+# 9. EXÉCUTION DES COLLECTES
 # ==========================================
 
 for source in sources_rss:
@@ -313,7 +383,9 @@ for source in sources_rss:
 
     except requests.RequestException as erreur:
         print(
-            "Erreur de connexion :",
+            "Erreur pour",
+            source["nom"],
+            ":",
             type(erreur).__name__
         )
 
@@ -328,40 +400,45 @@ except requests.RequestException as erreur:
 
 
 # ==========================================
-# 8. SAUVEGARDE JSON
+# 10. SAUVEGARDE DES DEUX JSON
 # ==========================================
 
-# Ecriture dans un fichier temporaire
-temporaire = fichier.with_suffix(".json.tmp")
+# Enregistrer toutes les publications
+enregistrer_json(
+    fichier_historique,
+    publications
+)
 
-with open(
-    temporaire,
-    "w",
-    encoding="utf-8"
-) as f:
-
-    json.dump(
-        publications,
-        f,
-        ensure_ascii=False,
-        indent=4
-    )
-
-# Remplacer le fichier principal
-temporaire.replace(fichier)
+# Enregistrer uniquement les nouveautés
+enregistrer_json(
+    fichier_nouvelles,
+    nouvelles_publications
+)
 
 
 # ==========================================
-# 9. BILAN FINAL
+# 11. BILAN FINAL
 # ==========================================
 
 print("\n" + "=" * 55)
-
-print("COLLECTE FINWATCH AI TERMINEE")
+print("COLLECTE FINWATCH AI TERMINÉE")
 
 print(
-    "Total de publications enregistrees :",
+    "Total dans l'historique :",
     len(publications)
 )
 
-print("Fichier JSON :", fichier.resolve())
+print(
+    "Nouvelles publications à analyser :",
+    len(nouvelles_publications)
+)
+
+print(
+    "Historique :",
+    fichier_historique.resolve()
+)
+
+print(
+    "Nouveautés :",
+    fichier_nouvelles.resolve()
+)
