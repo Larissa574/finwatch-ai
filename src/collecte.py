@@ -100,6 +100,7 @@ else:
 
 # Liste des articles nouveaux uniquement
 nouvelles_publications = []
+sources_en_erreur = []
 
 print(
     "Publications déjà enregistrées :",
@@ -305,12 +306,10 @@ def collecter_rss(source):
     flux = feedparser.parse(response.content)
 
     if not flux.get("version"):
-        print("Format RSS / Atom non reconnu.")
-        return
+        raise ValueError("Format RSS / Atom non reconnu.")
 
     if flux.bozo:
-        print("Anomalie XML :", flux.get("bozo_exception"))
-        return
+        raise ValueError(f"Anomalie XML : {flux.get('bozo_exception')}")
 
     total = len(flux.entries)
     nouvelles = 0
@@ -350,8 +349,7 @@ def collecter_arxiv():
     flux = feedparser.parse(response.content)
 
     if flux.get("version") != "atom10":
-        print("Format Atom non reconnu.")
-        return
+        raise ValueError("Format Atom non reconnu.")
 
     if flux.bozo:
         print("Anomalie XML :", flux.get("bozo_exception"))
@@ -381,22 +379,16 @@ for source in sources_rss:
     try:
         collecter_rss(source)
 
-    except requests.RequestException as erreur:
-        print(
-            "Erreur pour",
-            source["nom"],
-            ":",
-            type(erreur).__name__
-        )
+    except (requests.RequestException, ValueError) as erreur:
+        sources_en_erreur.append(source["nom"])
+        print("Erreur pour", source["nom"], ":", type(erreur).__name__, erreur)
 
 try:
     collecter_arxiv()
 
-except requests.RequestException as erreur:
-    print(
-        "Erreur arXiv :",
-        type(erreur).__name__
-    )
+except (requests.RequestException, ValueError) as erreur:
+    sources_en_erreur.append("arXiv")
+    print("Erreur arXiv :", type(erreur).__name__, erreur)
 
 
 # ==========================================
@@ -442,3 +434,7 @@ print(
     "Nouveautés :",
     fichier_nouvelles.resolve()
 )
+
+if sources_en_erreur:
+    print("COLLECTE PARTIELLE : sources en erreur :", ", ".join(sources_en_erreur))
+    raise SystemExit(1)
