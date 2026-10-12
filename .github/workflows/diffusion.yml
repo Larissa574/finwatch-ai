@@ -1,14 +1,12 @@
 name: FINWATCH - Bulletin hebdomadaire
 
 on:
-  schedule:
-    - cron: "17 6 * * 1"   # lundi 07h17 heure du Bénin (UTC+1)
   workflow_dispatch:
     inputs:
       dry_run:
         description: "Aperçu sans envoi"
         type: boolean
-        default: false
+        default: true
 
 jobs:
   diffusion:
@@ -32,9 +30,9 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: |
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            python diffusion.py diffuser --dry-run
+            python src/run_diffusion.py --dry-run
           else
-            python diffusion.py diffuser
+            python src/run_diffusion.py
           fi
       - uses: actions/upload-artifact@v4
         if: always()
