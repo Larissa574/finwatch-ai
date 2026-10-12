@@ -26,3 +26,6 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Identifiants Google Sheets
+secrets/
