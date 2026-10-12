@@ -1,21 +1,23 @@
-name: Vérification manuelle du contrat
+name: FINWATCH AI - Tests manuels
 
-# Déclenchement manuel uniquement : pas de tests à chaque push.
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  contrat:
+  tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Récupérer les fichiers
+      - name: Recuperer le depot
         uses: actions/checkout@v4
       - name: Installer Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Vérifier les exemples et la configuration
-        run: python -m unittest discover -s tests -v
-
-# À utiliser uniquement après validation du groupe.
-# Aucun collecteur RSS/API ni envoi d'e-mails n'est lancé par ce workflow.
+          python-version: "3.13"
+      - name: Installer les dependances sans les modeles IA lourds
+        run: python -m pip install -r requirements.txt
+      - name: Executer les tests unitaires et d'integration simulee
+        run: python -m pytest tests -v
