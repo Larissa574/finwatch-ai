@@ -1,6 +1,7 @@
 
 """Importe l'historique JSON dans Google Sheets sans doublons."""
 import json
+import os
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -109,10 +110,6 @@ def enregistrer_sources(feuille):
 def importer():
     if not JSON_FILE.is_file():
         raise FileNotFoundError(f"JSON introuvable : {JSON_FILE}")
-    if not CREDENTIALS.is_file():
-        raise FileNotFoundError(
-            f"Identifiants introuvables : {CREDENTIALS}"
-        )
 
     with JSON_FILE.open("r", encoding="utf-8") as fichier:
         publications = json.load(fichier)
@@ -120,8 +117,15 @@ def importer():
     if not isinstance(publications, list):
         raise ValueError("Le fichier JSON doit contenir une liste.")
 
-    client = gspread.service_account(filename=str(CREDENTIALS))
-    classeur = client.open(SPREADSHEET_NAME)
+    json_secret = os.getenv("GOOGLE_CREDENTIALS_JSON")
+    if json_secret:
+        client = gspread.service_account_from_dict(json.loads(json_secret))
+    elif CREDENTIALS.is_file():
+        client = gspread.service_account(filename=str(CREDENTIALS))
+    else:
+        raise FileNotFoundError("Identifiants Google Sheets absents.")
+    sheet_id = os.getenv("GOOGLE_SHEET_ID") or os.getenv("GOOGLE_SHEETS_ID")
+    classeur = client.open_by_key(sheet_id) if sheet_id else client.open(SPREADSHEET_NAME)
     feuille_pub = classeur.worksheet("Publications")
     feuille_sources = classeur.worksheet("Sources")
     feuille_journal = classeur.worksheet("Journal de collecte")
@@ -154,13 +158,15 @@ def importer():
         return compteurs[source]
 
     for publication in publications:
+        if not isinstance(publication, dict):
+            stats = compteur("Entree invalide")
+            stats["trouvees"] += 1
+            stats["erreurs"] += 1
+            continue
+
         source = str(publication.get("source") or "Source inconnue")
         stats = compteur(source)
         stats["trouvees"] += 1
-
-        if not isinstance(publication, dict):
-            stats["erreurs"] += 1
-            continue
 
         identifiant = publication.get("id")
         if not isinstance(identifiant, str) or not identifiant.strip():
