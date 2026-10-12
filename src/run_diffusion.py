@@ -83,8 +83,8 @@ class SheetsStore:
 
 
 def controle(pubs):
-    a_verifier = [p for p in pubs if p.get("statut_validation") == "A_VERIFIER"]
-    print(f"{len(a_verifier)} A_VERIFIER :")
+    a_verifier = [p for p in pubs if p.get("statut_validation") in ("A_VALIDER", "A_VERIFIER")]
+    print(f"{len(a_verifier)} publications en attente de validation :")
     for p in a_verifier:
         print(f"  - {p['id']} | {p.get('titre')}\n    {p.get('url')}")
     anomalies = []
