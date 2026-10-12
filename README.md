@@ -23,3 +23,10 @@ requirements.txt       Dépendances initiales
 .env.example           Noms des paramètres sensibles (sans secrets)
 ```
 
+Documentation du module 2
+
+- [`docs/rapport_technique_module2.md`](docs/rapport_technique_module2.md) : fonctionnement, entrées/sorties, inventaire des fichiers et état de conformité.
+- [`docs/guide_execution_module2.md`](docs/guide_execution_module2.md) : commandes d'installation, de test et d'exécution.
+- [`docs/passation_sosthene.md`](docs/passation_sosthene.md) : résumé autonome des changements et consignes de reprise/intégration.
+
+La configuration `config/mots_cles.json` est une proposition élargie à valider après les étapes d'évaluation humaine. Les champs supplémentaires `priorite` et `motif_rejet` sont uniquement ajoutés en sortie ; les neuf champs de collecte restent inchangés.

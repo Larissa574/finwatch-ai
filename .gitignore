@@ -26,3 +26,6 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Script local de verification, non versionne
+/verifier_module2.ps1
