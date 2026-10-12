@@ -31,12 +31,12 @@ class TestContrat(unittest.TestCase):
         )
         self.assertEqual(set(config["axes"]), CATEGORIES)
 
-    def test_catalogue_onze_sources(self):
+    def test_catalogue_cinq_sources_actives(self):
         config = json.loads(
             (RACINE / "config" / "sources.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(len(config["sources"]), 11)
-        self.assertTrue(all(s["statut"] == "A_TESTER" for s in config["sources"]))
+        self.assertEqual(len(config["sources"]), 5)
+        self.assertTrue(all(s["statut"] == "ACTIF" for s in config["sources"]))
 
 
 if __name__ == "__main__":
