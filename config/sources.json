@@ -1,71 +1,35 @@
 {
-  "description": "Catalogue de onze sources sélectionnées ; aucune connexion automatisée n'est déclarée opérationnelle.",
+  "description": "Sources V1 effectivement connectees dans src/collecte.py ; les autres sources ne font pas partie de la collecte active.",
   "sources": [
-    {
-      "nom": "arXiv",
-      "methode_envisagee": "API",
-      "priorite": "PREMIERE_PHASE",
-      "statut": "A_TESTER"
-    },
     {
       "nom": "BRI / BIS",
       "methode_envisagee": "RSS",
-      "priorite": "PREMIERE_PHASE",
-      "statut": "A_TESTER"
+      "priorite": "V1",
+      "statut": "ACTIF"
     },
     {
-      "nom": "BCE — Supervision bancaire",
+      "nom": "BCE - Supervision",
       "methode_envisagee": "RSS",
-      "priorite": "PREMIERE_PHASE",
-      "statut": "A_TESTER"
+      "priorite": "V1",
+      "statut": "ACTIF"
     },
     {
-      "nom": "FMI",
-      "methode_envisagee": "RSS / publications",
-      "priorite": "PHASE_SUIVANTE",
-      "statut": "A_TESTER"
+      "nom": "EBA - Actualites",
+      "methode_envisagee": "RSS",
+      "priorite": "V1",
+      "statut": "ACTIF"
     },
     {
-      "nom": "Springer Nature",
-      "methode_envisagee": "API de métadonnées (clé nécessaire)",
-      "priorite": "PHASE_SUIVANTE",
-      "statut": "A_TESTER"
+      "nom": "Finextra AI",
+      "methode_envisagee": "RSS",
+      "priorite": "V1",
+      "statut": "ACTIF"
     },
     {
-      "nom": "OCDE",
-      "methode_envisagee": "Alertes ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
-    },
-    {
-      "nom": "EBA",
-      "methode_envisagee": "RSS ou alertes ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
-    },
-    {
-      "nom": "IOSCO / OICV",
-      "methode_envisagee": "Alertes ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
-    },
-    {
-      "nom": "CGAP",
-      "methode_envisagee": "Alertes ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
-    },
-    {
-      "nom": "BCEAO",
-      "methode_envisagee": "Alertes officielles ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
-    },
-    {
-      "nom": "AMF-UMOA",
-      "methode_envisagee": "RSS ou alertes ciblées",
-      "priorite": "CATALOGUE",
-      "statut": "A_TESTER"
+      "nom": "arXiv",
+      "methode_envisagee": "API Atom",
+      "priorite": "V1",
+      "statut": "ACTIF"
     }
   ]
 }
