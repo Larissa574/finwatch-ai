@@ -1,0 +1,160 @@
+[
+    {
+        "id": "0c935033ab59f6d62cea2f5834acb63a6c157ad40b5260bf9036979ac1ceb302",
+        "titre": "Deep learning for credit scoring in microfinance institutions",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00001v1",
+        "date_publication": "2026-10-09T17:59:59+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [
+            "A. Diallo",
+            "M. Kone"
+        ],
+        "resume_original": "We study deep learning models for credit scoring of small borrowers in microfinance institutions and compare them with logistic regression on a public dataset.",
+        "type_document": "publication"
+    },
+    {
+        "id": "27653e156cca1a4b0b294a06aa4f59a589195bb43ccf398ea4118c47092e73de",
+        "titre": "Generative AI and the supervision of banks: a regulatory perspective",
+        "source": "BRI / BIS",
+        "url": "https://www.bis.org/fsi/publ/insights99.htm",
+        "date_publication": "2026-10-08",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "<p>This paper discusses how supervisors can use generative AI tools for banking supervision and what compliance risks arise.</p>",
+        "type_document": "publication"
+    },
+    {
+        "id": "a0ebea22cfe2a4fb07afed75906456f79d20462f8bccf38d3a5e409f91526712",
+        "titre": "ECB Banking Supervision Newsletter - October 2026",
+        "source": "BCE - Supervision",
+        "url": "https://www.bankingsupervision.europa.eu/press/newsletter/2026/html/nl261010.en.html",
+        "date_publication": "2026-10-10T00:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": null,
+        "type_document": "publication"
+    },
+    {
+        "id": "d21cf037ea38028e21a2fc320bf12b4117ce9034e4fad10351b96023cbb9c7d6",
+        "titre": "EBA publishes its work programme for the coming year",
+        "source": "EBA - Actualites",
+        "url": "https://www.eba.europa.eu/news-press/news/eba-work-programme",
+        "date_publication": "2026-10-07T12:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "The EBA has published its work programme, which includes regulatory technical standards and guidelines for credit institutions.",
+        "type_document": "publication"
+    },
+    {
+        "id": "3814151829dc6195ade517fe8b701d00a395a21f8dd884259b1b552ce5dac899",
+        "titre": "Bank rolls out generative AI assistant for fraud detection",
+        "source": "Finextra AI",
+        "url": "https://www.finextra.com/newsarticle/00001/bank-rolls-out-ai-assistant",
+        "date_publication": "2026-10-10T09:15:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "<p>A <b>European bank</b> has deployed a generative AI assistant to help analysts triage <em>fraud</em> alerts.</p>",
+        "type_document": "publication"
+    },
+    {
+        "id": "e4c66d0a30788a57553bbb5779c8d27af4fc0cae6e492f34d2da13a64d78c373",
+        "titre": "Credit assignment in deep reinforcement learning for robotics",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00002v1",
+        "date_publication": "2026-10-09T16:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [
+            "L. Martin"
+        ],
+        "resume_original": "We propose a new credit assignment method for deep reinforcement learning agents controlling robotic arms in simulation.",
+        "type_document": "publication"
+    },
+    {
+        "id": "ceefeb0fa70a842406593dc70186c3c22d28855311f9acd804cb47127af8689c",
+        "titre": "Call for papers: annual workshop on monetary history",
+        "source": "BRI / BIS",
+        "url": "https://www.bis.org/events/cfp-monetary-history.htm",
+        "date_publication": "2026-10-06",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "The workshop welcomes historical studies on early currencies, trade routes and archival sources across several centuries.",
+        "type_document": "publication"
+    },
+    {
+        "id": "cd9d318b1e95a12abe09aff2a1490b577511c8557b427001cbdf0d27d58bf25f",
+        "titre": "Bank rolls out generative AI assistant for fraud detection",
+        "source": "Finextra AI (reprise)",
+        "url": "https://example.org/repost-bank-ai-assistant",
+        "date_publication": "2026-10-10T09:15:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "<p>A <b>European bank</b> has deployed a generative AI assistant to help analysts triage <em>fraud</em> alerts.</p>",
+        "type_document": "publication"
+    },
+    {
+        "id": "0c935033ab59f6d62cea2f5834acb63a6c157ad40b5260bf9036979ac1ceb302",
+        "titre": "Deep learning for credit scoring in microfinance institutions (v2)",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00001v1",
+        "date_publication": "2026-10-09T17:59:59+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [
+            "A. Diallo",
+            "M. Kone"
+        ],
+        "resume_original": "Version 2 of the same paper.",
+        "type_document": "publication"
+    },
+    {
+        "id": "dabe31c98657c0f4876d0b805270ca001b37cc3556a5249de6eaacd36179934e",
+        "titre": "Large language models for banking compliance",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00003v1",
+        "date_publication": "2026-10-09T10:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": null,
+        "type_document": "publication"
+    },
+    {
+        "id": "9ca6b9fa8b6447950b989ebe854c6ab10815c68b1867588582245e6076902b75",
+        "titre": "[TEST-PANNE] Machine learning for bank fraud detection",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00004v1",
+        "date_publication": "2026-10-09T09:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "A machine learning approach to bank fraud detection on card payments, evaluated on anonymised transaction data from several retail banks.",
+        "type_document": "publication"
+    },
+    {
+        "id": "2f2cd7026eb583051f3b01633709e523482368d1988aebc12514a0c8a318859a",
+        "titre": "[TEST-JSON] Neural networks for loan default prediction",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00005v1",
+        "date_publication": "2026-10-09T08:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "Neural networks are applied to loan default prediction for retail banking customers.",
+        "type_document": "publication"
+    },
+    {
+        "id": "5ead9c1d87e25b05320343b8d49da82c16f01550e4cb711a0083939cb7056119",
+        "titre": "[TEST-CHIFFRE] AI-driven algorithmic trading strategies",
+        "source": "arXiv",
+        "url": "https://arxiv.org/abs/2610.00006v1",
+        "date_publication": "2026-10-09T07:00:00+00:00",
+        "date_collecte": "2026-10-11T08:30:12.481233+00:00",
+        "auteur": [],
+        "resume_original": "We design AI-driven algorithmic trading strategies and test them on equity market data.",
+        "type_document": "publication"
+    },
+    {
+        "id": "x1",
+        "titre": "Publication sans lien",
+        "source": "Test",
+        "url": null
+    },
+    "ceci n'est pas un objet"
+]
