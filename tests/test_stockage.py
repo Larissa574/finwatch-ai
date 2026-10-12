@@ -76,3 +76,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def test_stockage_sans_api():
+    """Expose le scenario deja existant a pytest, en restaurant _feuille."""
+    from unittest.mock import patch
+    with patch.object(stockage, "_feuille"):
+        main()
