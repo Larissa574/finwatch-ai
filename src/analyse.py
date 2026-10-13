@@ -409,9 +409,16 @@ def appeler_gemini(systeme, utilisateur):
         cle = cle_api()
         if not cle:
             raise RuntimeError("clé d'API absente (variable IA_API_KEY)")
-        _client_gemini = genai.Client(api_key=cle)
+        # Le SDK ne doit pas ajouter ses propres relances aux notres.
+        _client_gemini = genai.Client(
+            api_key=cle,
+            http_options=types.HttpOptions(
+                timeout=30000,
+                retry_options=types.HttpRetryOptions(attempts=1),
+            ),
+        )
 
-    for tentative in range(1, 4):
+    for tentative in range(1, 3):
         try:
             reponse = _client_gemini.models.generate_content(
                 model=nom_modele(),
@@ -424,12 +431,14 @@ def appeler_gemini(systeme, utilisateur):
             )
             return reponse.text
         except Exception as erreur:
-            temporaire = any(c in str(erreur) for c in
-                             ("429", "503", "UNAVAILABLE", "RESOURCE_EXHAUSTED"))
-            if not temporaire or tentative == 3:
+            code = getattr(erreur, "code", None)
+            temporaire = (code in (408, 429, 500, 502, 503, 504)
+                          or any(c in str(erreur) for c in
+                                 ("Timeout", "ConnectError", "UNAVAILABLE", "RESOURCE_EXHAUSTED")))
+            if not temporaire or tentative == 2:
                 raise
-            attente = 15 * tentative
-            print(f"[!] API occupée ou quota atteint (essai {tentative}/3) : pause de {attente} s")
+            attente = 5
+            print(f"[!] Gemini indisponible temporairement (tentative {tentative}/2) : pause de {attente} s")
             time.sleep(attente)
 
 
@@ -631,7 +640,7 @@ def traiter_une(pub, classificateur, appeler, panne_api, mots=None):
 
 
 def traiter_publications(publications, classificateur=None, appeler=appeler_gemini,
-                         pause=0.0, mots_cles=None):
+                         pause=0.0, mots_cles=None, progression=None, precedents=None):
     """
     Fonction principale (utilisable aussi depuis un autre script) :
     liste du collecteur -> (liste enrichie, journal).
@@ -664,7 +673,15 @@ def traiter_publications(publications, classificateur=None, appeler=appeler_gemi
     uniques, journal["doublons_ecartes"] = dedoublonner(valides)
 
     resultats, echecs_api_consecutifs = [], 0
+    precedents = precedents or {}
     for pub in uniques:
+        deja = precedents.get(pub["id"])
+        if deja is not None and deja.get("statut_analyse") == "effectuee":
+            resultat = deja
+            resultats.append(resultat)
+            if progression:
+                progression(resultats, journal)
+            continue
         try:
             objet, panne = traiter_une(pub, classificateur, appeler, echecs_api_consecutifs >= 3, mots)
         except Exception as erreur:  # filet de sécurité : jamais de perte silencieuse
@@ -684,6 +701,8 @@ def traiter_publications(publications, classificateur=None, appeler=appeler_gemi
         if erreurs:
             journal["sorties_non_conformes"].append({"id": pub["id"], "erreurs": erreurs})
         resultats.append(objet)
+        if progression:
+            progression(resultats, journal)
     return resultats, journal
 
 
@@ -747,6 +766,8 @@ def main():
     parser.add_argument("--source", default=None,
                         help="ne traiter que les publications dont la source contient ce texte")
     parser.add_argument("--verifier-api", action="store_true")
+    parser.add_argument("--reprendre", action="store_true",
+                        help="reutiliser les analyses terminees du fichier de sortie et reprendre le lot")
     args = parser.parse_args()
 
     if args.verifier_api:
@@ -787,9 +808,29 @@ def main():
     if est_essai and not args.sortie:
         print(f"[ESSAI] Résultat écrit dans {sortie} : le fichier officiel n'est pas modifié.")
 
-    resultats, journal = traiter_publications(
-        publications, classificateur, appeler,
-        pause=0.0 if args.ia_simulee else args.pause, mots_cles=mots)
+    precedents = {}
+    if args.reprendre and sortie.exists():
+        try:
+            anciens = charger_publications(sortie)
+            precedents = {p["id"]: p for p in anciens
+                          if isinstance(p, dict) and isinstance(p.get("id"), str)}
+            print(f"[REPRISE] {len(precedents)} anciennes publications disponibles.")
+        except ValueError as erreur:
+            print(f"[ERREUR] Reprise impossible : {erreur}")
+            sys.exit(1)
+
+    def sauvegarder_progression(partiel, etat_journal):
+        exporter(sortie, partiel)
+        exporter(journal_chemin, etat_journal)
+
+    try:
+        resultats, journal = traiter_publications(
+            publications, classificateur, appeler,
+            pause=0.0 if args.ia_simulee else args.pause, mots_cles=mots,
+            progression=sauvegarder_progression, precedents=precedents)
+    except KeyboardInterrupt:
+        print("\\n[INTERRUPTION] Les publications deja traitees sont sauvegardees ; relancer avec --reprendre.")
+        sys.exit(130)
     journal["parametres"].update({
         "ia_simulee": args.ia_simulee,
         "classificateur": MODELE_ZERO_SHOT if classificateur else None,
