@@ -93,8 +93,7 @@ def generer_bulletin(publications: list[dict[str, Any]]) -> str:
         '<p style="color:#dcecf9;margin:0;font-size:16px">Bulletin de veille stratégique · IA et finance</p>',
         '</div>',
         '<div style="padding:22px 26px">',
-        f'<p style="color:#607386;font-size:13px;margin:0 0 18px">{date_txt} · '
-        f'{len(validees)} publication(s) validée(s)</p>',
+        f'<p style="color:#607386;font-size:13px;margin:0 0 18px">{date_txt}</p>',
         '<p style="font-size:15px;line-height:1.6;margin:0 0 25px">'
         "Les évolutions de l’intelligence artificielle dans le secteur financier, "
         "présentées sous forme de synthèses vérifiées et sourcées.</p>",
@@ -127,8 +126,7 @@ def generer_bulletin(publications: list[dict[str, Any]]) -> str:
             ])
     h.extend([
         '<p style="font-size:12px;line-height:1.6;color:#718292;margin:27px 0 0">'
-        "FINWATCH AI · Projet universitaire de veille. Les synthèses ont fait l’objet "
-        "d’une validation humaine. Consultez les sources avant toute décision.</p>",
+        "FINWATCH AI · Consultez les sources originales avant toute décision.</p>",
         '</div></div></body></html>',
     ])
     return "".join(h)
