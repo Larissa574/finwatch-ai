@@ -42,6 +42,8 @@ def convertir_analyse(publication):
         ("innovation", "innovation"),
         ("probleme_financier", "application_financiere"),
         ("interet_financier", "impact_potentiel"),
+        ("probleme_financier", "probleme_financier"),
+        ("interet_financier", "interet_financier"),
     ]:
         texte = publication.get(depart)
         if isinstance(texte, str) and texte.strip():
