@@ -821,7 +821,17 @@ def main():
             print(f"[ERREUR] Reprise impossible : {erreur}")
             sys.exit(1)
 
-    parametres_execution = {\n        "ia_simulee": args.ia_simulee,\n        "classificateur": MODELE_ZERO_SHOT if classificateur else None,\n        "modele_llm": "simulee" if args.ia_simulee else nom_modele(),\n        "seuil_pertinent": SEUIL_PERTINENT, "seuil_rejet": SEUIL_REJET,\n        "source": args.source, "limite": args.limite,\n        "empreinte_mots_cles_sha256": empreinte_config_mots_cles(),\n    }\n\n    def sauvegarder_progression(partiel, etat_journal):\n        etat_journal["parametres"].update(parametres_execution)
+    parametres_execution = {
+        "ia_simulee": args.ia_simulee,
+        "classificateur": MODELE_ZERO_SHOT if classificateur else None,
+        "modele_llm": "simulee" if args.ia_simulee else nom_modele(),
+        "seuil_pertinent": SEUIL_PERTINENT, "seuil_rejet": SEUIL_REJET,
+        "source": args.source, "limite": args.limite,
+        "empreinte_mots_cles_sha256": empreinte_config_mots_cles(),
+    }
+
+    def sauvegarder_progression(partiel, etat_journal):
+        etat_journal["parametres"].update(parametres_execution)
         exporter(sortie, partiel)
         exporter(journal_chemin, etat_journal)
 
