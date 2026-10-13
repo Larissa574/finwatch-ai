@@ -31,13 +31,45 @@ function inscrire(email,consentement) {
   const e=email_(email);statut_(e,'ACTIF','formulaire web - accord explicite');
   return 'Votre inscription à FINWATCH AI a été enregistrée.';
 }
+// GET n'effectue jamais de modification : les robots des messageries suivent parfois les liens.
 function doGet(e) {
   const p=e&&e.parameter||{};
   if(p.action==='unsubscribe') {
-    let message='Lien de désinscription invalide.';
-    try { const mail=email_(p.email);if(verifierToken_(mail,p.token)){statut_(mail,'DESINSCRIT','');message='Votre désinscription à FINWATCH AI a été prise en compte.';} }
-    catch(err){message='Impossible de traiter cette demande.';}
-    return HtmlService.createHtmlOutput('<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font:17px Arial;margin:60px auto;max-width:620px"><h1>FINWATCH AI</h1><p>'+message+'</p></body></html>');
+    let adresse='', jeton='', valide=false;
+    try {
+      adresse=email_(p.email);
+      jeton=String(p.token||'');
+      valide=verifierToken_(adresse,jeton);
+    } catch(err) { valide=false; }
+    const page=HtmlService.createTemplateFromFile('Desinscription');
+    page.adresse=valide ? adresse : '';
+    page.jeton=valide ? jeton : '';
+    page.valide=valide;
+    return page.evaluate().setTitle('FINWATCH AI — Se désabonner');
   }
   return HtmlService.createTemplateFromFile('Index').evaluate().setTitle('FINWATCH AI — Newsletter');
+}
+
+// Uniquement appelée après action explicite sur le bouton de confirmation.
+function confirmerDesinscription(email,jeton) {
+  const adresse=email_(email);
+  if(!verifierToken_(adresse,jeton)) throw Error('Lien de désinscription invalide.');
+  const lock=LockService.getScriptLock();lock.waitLock(20000);
+  try {
+    const s=table_(), data=s.getDataRange().getValues();
+    let indices=[];
+    for(let i=1;i<data.length;i++) {
+      if(String(data[i][0]).trim().toLowerCase()===adresse) indices.push(i+1);
+    }
+    if(indices.length===0) return 'Cette adresse ne figure pas dans nos abonnements.';
+    const maintenant=new Date().toISOString();
+    // En cas de doublons historiques, tous sont désactivés.
+    indices.forEach(function(i) {
+      const old=data[i-1];
+      s.getRange(i,1,1,5).setValues([[
+        adresse,'DESINSCRIT',old[2],old[3]||maintenant,old[4]
+      ]]);
+    });
+    return 'Votre désinscription a été confirmée. Vous ne recevrez plus les prochains bulletins FINWATCH AI.';
+  } finally { lock.releaseLock(); }
 }
