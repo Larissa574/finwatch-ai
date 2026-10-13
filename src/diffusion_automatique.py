@@ -8,6 +8,7 @@ import hashlib
 import hmac
 import html
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from email.utils import parseaddr
@@ -71,7 +72,7 @@ def ajouter_desinscription(bulletin, email):
     return bulletin.replace("</body>", bloc + "</body>")
 
 
-def run(send=False):
+def run(send=False, campagne_test=None):
     book = stockage._feuille().spreadsheet
     abonnes = onglet(book, "Abonnes", HEADERS_ABONNES)
     journal = onglet(book, "Journal envois", HEADERS_JOURNAL)
@@ -82,6 +83,10 @@ def run(send=False):
         return 0
     ids = sorted(str(p["id"]) for p in pubs)
     campagne = hashlib.sha256("\n".join(ids).encode()).hexdigest()[:20]
+    if campagne_test:
+        if not re.fullmatch(r"[a-zA-Z0-9_-]{5,50}", campagne_test):
+            raise ValueError("Identifiant de campagne invalide.")
+        campagne = "test-" + campagne_test
     deja = {(str(r["campagne"]), str(r["email"]).lower()) for r in journal.get_all_records()
             if r.get("statut") == "ENVOYE"}
     destinataires = [a for a in emails_actifs(abonnes) if (campagne, a) not in deja]
@@ -125,5 +130,6 @@ def run(send=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--send", action="store_true")
+    parser.add_argument("--campagne-test", help="Identifiant de nouvelle campagne de test")
     args = parser.parse_args()
-    sys.exit(run(args.send))
+    sys.exit(run(args.send, args.campagne_test))
