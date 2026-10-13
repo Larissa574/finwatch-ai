@@ -1,0 +1,30 @@
+name: FINWATCH AI - collecte et analyse
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: finwatch-collecte
+  cancel-in-progress: false
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+      GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+      IA_API_KEY: ${{ secrets.IA_API_KEY }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install -r requirements.txt transformers torch sentencepiece
+      - run: python src/collecte.py
+      - run: python src/importer_stockage.py
+      - run: python src/analyse.py --entree data/collecte/nouvelles_publications.json --sortie data/analyse/publications_analysees.json
+      - run: python src/importer_analyses.py
