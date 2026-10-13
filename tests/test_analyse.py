@@ -319,3 +319,13 @@ class TestLigneDeCommande(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPromptEditorial(unittest.TestCase):
+    def test_prompt_conserve_contrat_json_et_sobriete(self):
+        s = a.PROMPT_SYSTEME
+        self.assertIn("resume_fr", s)
+        self.assertIn("55 à 110 mots", s)
+        self.assertIn("Ne présente aucune hypothèse comme un fait", s)
+        self.assertIn("JSON null", s)
+        self.assertIn("innovation", s)
