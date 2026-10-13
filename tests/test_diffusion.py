@@ -64,3 +64,29 @@ def test_diffuser_echec_incident(monkeypatch):  # T06
 def test_rien_a_envoyer(monkeypatch):
     monkeypatch.setattr(diffusion, "envoyer_bulletin", lambda h: pytest.fail("ne doit pas envoyer"))
     assert diffusion.diffuser([pub(statut_envoi="ENVOYE")], None, None) == 0
+
+
+def test_template_v2_synthese_unifiee_source_et_date():
+    h = diffusion.generer_bulletin([pub(
+        titre="Nouvelles règles pour les banques",
+        resume_ia="La banque centrale introduit une revue indépendante des projets d’IA.",
+        date_publication="2026-10-08T12:49:00+00:00",
+        innovation="AFFIRMATION NON VERIFIEE",
+        application_financiere="APPLICATION A PART",
+        impact_potentiel="IMPACT A PART",
+    )])
+    assert "Bulletin de veille stratégique" in h
+    assert "08/10/2026" in h
+    assert "Consulter la source originale" in h
+    assert 'href="https://example.org/a"' in h
+    assert "La banque centrale introduit" in h
+    assert "AFFIRMATION NON VERIFIEE" not in h
+    assert "APPLICATION A PART" not in h
+    assert "IMPACT A PART" not in h
+    assert "Résumé vérifié :" not in h
+
+
+def test_template_v2_texte_echappe():
+    h = diffusion.generer_bulletin([pub(resume_ia="<script>attaque</script>")])
+    assert "<script>" not in h
+    assert "&lt;script&gt;" in h
