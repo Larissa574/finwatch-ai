@@ -64,6 +64,30 @@ class TestFiltrage(unittest.TestCase):
         self.assertEqual(a.decider("aucun", None, False), "incertain")
         self.assertEqual(a.decider("aucun", None, True), "non_pertinent")
 
+    def test_finextra_finance_sans_ia_ne_declenche_pas_gemini(self):
+        cas = [
+            ("FCA cracks down on finfluencers",
+             "The UK's financial watchdog has stepped up enforcement of illegal finfluencer promotions.", 0.7114),
+            ("Goldman Sachs appoints banking tech co-head",
+             "Goldman Sachs names an executive as co-head of technology investment banking.", 0.736),
+        ]
+        for i, (titre, resume, score) in enumerate(cas):
+            article = pub(f"finextra-{i}", titre, resume, source="Finextra AI")
+            appels = []
+            resultats, _ = traiter([article], lambda texte: score,
+                                  lambda systeme, utilisateur: appels.append(utilisateur))
+            self.assertEqual(resultats[0]["statut_pertinence"], "incertain")
+            self.assertEqual(appels, [])
+            self.assertIn("revue humaine", resultats[0]["justification_filtrage"])
+
+    def test_finextra_ia_et_finance_reste_pertinent(self):
+        article = pub("singapour", "Singapore central bank issues risk rules on banks' AI use",
+                      "Banks in Singapore must seek an independent review of any forthcoming AI projects before implementation.",
+                      source="Finextra AI")
+        resultats, _ = traiter([article], lambda texte: 0.8622, ok_ia)
+        self.assertEqual(resultats[0]["statut_pertinence"], "pertinent")
+        self.assertEqual(resultats[0]["statut_analyse"], "effectuee")
+
     def test_faux_positif_credit_assignment(self):
         p = pub("r", "Credit assignment in deep reinforcement learning for robotics",
                 "We propose a new credit assignment method for deep reinforcement learning "
