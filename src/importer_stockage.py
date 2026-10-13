@@ -18,8 +18,9 @@ PUBLICATION_HEADERS = [
     "id", "titre", "source", "url", "date_publication",
     "date_collecte", "auteur", "resume_original", "type_document",
     "resume_ia", "categorie", "innovation", "application_financiere",
-    "impact_potentiel", "statut_validation", "valide_par",
-    "date_validation", "statut_envoi", "date_envoi",
+    "impact_potentiel", "probleme_financier", "interet_financier",
+    "statut_validation", "valide_par", "date_validation",
+    "statut_envoi", "date_envoi",
 ]
 
 SOURCE_HEADERS = ["nom_source", "url_source", "type_source", "actif"]
