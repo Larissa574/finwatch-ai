@@ -14,17 +14,32 @@ function token_(email) {
   return bytes.map(x=>('0'+(x&255).toString(16)).slice(-2)).join('');
 }
 function verifierToken_(a,b) { const t=token_(a); return /^[a-f0-9]{64}$/.test(String(b||'')) && t===b; }
+function enregistrerStatutUnique_(s, email, etat, source) {
+  const lignes=s.getDataRange().getValues();
+  const correspondances=[];
+  for(let i=1;i<lignes.length;i++) {
+    if(String(lignes[i][0]).trim().toLowerCase()===email) correspondances.push(i+1);
+  }
+  const maintenant=new Date().toISOString();
+  const lignePrincipale=correspondances.length ? correspondances[0] : null;
+  const ancienne=lignePrincipale ? lignes[lignePrincipale-1] : null;
+  const dateInscription=etat==='ACTIF' ? maintenant : (ancienne ? ancienne[2] : '');
+  const dateDesinscription=etat==='DESINSCRIT' ? maintenant : '';
+  const provenance=etat==='ACTIF' ? source : (ancienne ? ancienne[4] : '');
+  const valeurs=[email,etat,dateInscription,dateDesinscription,provenance];
+  if(lignePrincipale) {
+    s.getRange(lignePrincipale,1,1,5).setValues([valeurs]);
+    // Supprimer les doublons en partant du bas pour ne pas decaler les indices.
+    correspondances.slice(1).reverse().forEach(function(numero){ s.deleteRow(numero); });
+  } else {
+    s.appendRow(valeurs);
+  }
+}
 function statut_(email,etat,source) {
   const lock=LockService.getScriptLock();lock.waitLock(20000);
   try {
-    const s=table_(), valeurs=s.getDataRange().getValues(); let ligne=0;
-    for(let i=1;i<valeurs.length;i++) if(String(valeurs[i][0]).toLowerCase()===email) ligne=i+1;
-    const old=ligne?valeurs[ligne-1]:null, maintenant=new Date().toISOString();
-    const inscription=etat==='ACTIF' ? maintenant : (old ? old[2] : '');
-    const retrait=etat==='DESINSCRIT' ? maintenant : '';
-    const donnee=[email,etat,inscription,retrait,etat==='ACTIF'?source:(old?old[4]:'')];
-    if(ligne) s.getRange(ligne,1,1,5).setValues([donnee]); else s.appendRow(donnee);
-  } finally {lock.releaseLock();}
+    enregistrerStatutUnique_(table_(),email,etat,source);
+  } finally { lock.releaseLock(); }
 }
 function inscrire(email,consentement) {
   if(consentement!==true) throw Error('Consentement obligatoire');
@@ -57,19 +72,11 @@ function confirmerDesinscription(email,jeton) {
   const lock=LockService.getScriptLock();lock.waitLock(20000);
   try {
     const s=table_(), data=s.getDataRange().getValues();
-    let indices=[];
-    for(let i=1;i<data.length;i++) {
-      if(String(data[i][0]).trim().toLowerCase()===adresse) indices.push(i+1);
-    }
-    if(indices.length===0) return 'Cette adresse ne figure pas dans nos abonnements.';
-    const maintenant=new Date().toISOString();
-    // En cas de doublons historiques, tous sont désactivés.
-    indices.forEach(function(i) {
-      const old=data[i-1];
-      s.getRange(i,1,1,5).setValues([[
-        adresse,'DESINSCRIT',old[2],old[3]||maintenant,old[4]
-      ]]);
+    const existe=data.slice(1).some(function(ligne) {
+      return String(ligne[0]).trim().toLowerCase()===adresse;
     });
+    if(!existe) return 'Cette adresse ne figure pas dans nos abonnements.';
+    enregistrerStatutUnique_(s,adresse,'DESINSCRIT','');
     return 'Votre désinscription a été confirmée. Vous ne recevrez plus les prochains bulletins FINWATCH AI.';
   } finally { lock.releaseLock(); }
 }
