@@ -111,7 +111,23 @@ def main():
     if os.getenv("STORE", "sheets").lower() == "json":
         store = JsonStore(os.getenv("JSON_PATH", "tests/donnees_test.json"))
     else:
-        store = SheetsStore(os.environ["GOOGLE_SHEET_ID"], os.environ["GOOGLE_CREDENTIALS_JSON"])
+        import stockage
+        # Meme authentification que la collecte / le stockage : variable JSON
+        # ou fichier prive secrets/finwatch-sheets.json.
+        feuille = stockage._feuille()
+        class StockageLecture:
+            def lire(self):
+                return stockage._lire_publications(feuille)
+        if a.controle or a.dry_run:
+            store = StockageLecture()
+        else:
+            secret = os.getenv("GOOGLE_CREDENTIALS_JSON")
+            if not secret:
+                chemin = stockage.CREDENTIALS
+                if not chemin.is_file():
+                    raise FileNotFoundError("Identifiants Google Sheets absents.")
+                secret = chemin.read_text(encoding="utf-8")
+            store = SheetsStore(os.getenv("GOOGLE_SHEET_ID") or os.getenv("GOOGLE_SHEETS_ID"), secret)
 
     pubs = store.lire()
     if a.controle:
