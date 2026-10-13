@@ -61,9 +61,13 @@ def lien_desinscription(email):
 
 def ajouter_desinscription(bulletin, email):
     lien = html.escape(lien_desinscription(email), quote=True)
-    bloc = ('<div style="padding:18px 26px;font:12px Arial;color:#607386">'
-            'Vous recevez cet email suite à votre inscription à FINWATCH AI. '
-            f'<a href="{lien}">Se désabonner</a>.</div>')
+    bloc = ('<div style="padding:24px 26px;text-align:center;'
+            'font:12px Arial;color:#607386;background:#f2f6fa">'
+            '<p>Vous recevez cet email parce que vous êtes abonné à FINWATCH AI.</p>'
+            f'<a href="{lien}" style="display:inline-block;padding:12px 20px;'
+            'border-radius:8px;background:#e2e8ef;color:#103c61;'
+            'text-decoration:none;font-weight:bold;font-size:14px">'
+            'Se désabonner</a></div>')
     return bulletin.replace("</body>", bloc + "</body>")
 
 
