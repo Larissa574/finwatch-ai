@@ -55,8 +55,23 @@ def selectionner_a_envoyer(
     ]
 
 
+def _date_courte(valeur):
+    """Affiche une date ISO de maniere concise, sans inventer de date."""
+    if not valeur:
+        return None
+    try:
+        return datetime.fromisoformat(str(valeur).replace("Z", "+00:00")).strftime("%d/%m/%Y")
+    except (ValueError, TypeError):
+        return str(valeur)
+
+
 def generer_bulletin(publications: list[dict[str, Any]]) -> str:
-    """Produire le HTML à partir des seules analyses validées."""
+    """Bulletin V2 : une synthese editoriale unifiee par publication.
+
+    Le texte affiche est le resume_fr deja valide, stocke dans resume_ia.
+    Ne jamais assembler automatiquement innovation/impact en prose : ces
+    champs peuvent contenir des hypotheses non etayees par la source.
+    """
     validees = [p for p in publications if _est_validee(p)]
     if not validees:
         raise ValueError("Aucune analyse validée : pas de bulletin à générer.")
@@ -68,35 +83,54 @@ def generer_bulletin(publications: list[dict[str, Any]]) -> str:
 
     date_txt = datetime.now(timezone.utc).strftime("%d/%m/%Y")
     h = [
-        '<html><body style="font-family:Arial,sans-serif;max-width:680px;margin:auto;color:#222">',
-        '<h1 style="color:#0b3d6b">FINWATCH AI — Bulletin de veille</h1>',
-        f'<p style="color:#555">{date_txt} · {len(validees)} publication(s) vérifiée(s) '
-        "par un membre de l'équipe.</p>",
+        '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        '<title>FINWATCH AI — Bulletin de veille</title></head>',
+        '<body style="margin:0;padding:0;background:#eef3f7;font-family:Arial,Helvetica,sans-serif;color:#172b3a">',
+        '<div style="max-width:680px;margin:0 auto;background:#ffffff">',
+        '<div style="background:#103c61;padding:30px 26px">',
+        '<h1 style="color:#ffffff;font-size:28px;margin:0 0 8px">FINWATCH AI</h1>',
+        '<p style="color:#dcecf9;margin:0;font-size:16px">Bulletin de veille stratégique · IA et finance</p>',
+        '</div>',
+        '<div style="padding:22px 26px">',
+        f'<p style="color:#607386;font-size:13px;margin:0 0 18px">{date_txt} · '
+        f'{len(validees)} publication(s) validée(s)</p>',
+        '<p style="font-size:15px;line-height:1.6;margin:0 0 25px">'
+        "Les évolutions de l’intelligence artificielle dans le secteur financier, "
+        "présentées sous forme de synthèses vérifiées et sourcées.</p>",
     ]
     for code, items in groupes.items():
         if not items:
             continue
         h.append(
-            f'<h2 style="color:#0b3d6b;border-bottom:2px solid #0b3d6b">'
-            f"{_e(AXES.get(code, AUTRES))}</h2>"
+            '<h2 style="font-size:18px;color:#103c61;margin:25px 0 14px;'
+            'padding-bottom:8px;border-bottom:2px solid #103c61">'
+            f'{_e(AXES.get(code, AUTRES))}</h2>'
         )
         for p in items:
-            h.append(
-                '<div style="margin:14px 0;padding:10px;background:#f5f8fb;border-radius:6px">'
-                f'<h3 style="margin:0 0 4px"><a href="{_e(_url_sure(p["url"]))}">{_e(p["titre"])}</a></h3>'
-                f'<div style="color:#666;font-size:13px">{_e(p["source"])} · '
-                f'publié le {_e(p.get("date_publication"))}</div>'
-                f'<p><b>Résumé vérifié :</b> {_e(p["resume_ia"])}</p>'
-                f'<p><b>Innovation :</b> {_e(p.get("innovation"))}</p>'
-                f'<p><b>Application financière :</b> {_e(p.get("application_financiere"))}</p>'
-                f'<p><b>Intérêt potentiel :</b> {_e(p.get("impact_potentiel"))}</p>'
-                f'<div style="font-size:12px;color:#888">Validé par {_e(p.get("valide_par"))} '
-                f'le {_e(p.get("date_validation"))}</div></div>'
-            )
-    h.append(
-        '<p style="font-size:12px;color:#888">Projet universitaire FINWATCH AI. '
-        "Consultez la source originale avant toute décision.</p></body></html>"
-    )
+            url = _e(_url_sure(p["url"]))
+            titre = _e(p["titre"])
+            date_pub = _date_courte(p.get("date_publication"))
+            meta = _e(p["source"])
+            if date_pub:
+                meta += " · " + _e(date_pub)
+            # Le resume_ia doit etre valide comme texte final coherent.
+            synthese = _e(p["resume_ia"]).replace("\\n", "<br>")
+            h.extend([
+                '<div style="padding:18px 0;border-bottom:1px solid #e1e8ef">',
+                f'<h3 style="font-size:18px;line-height:1.4;margin:0 0 7px;color:#172b3a">{titre}</h3>',
+                f'<p style="font-size:12px;color:#697c8d;margin:0 0 13px">{meta}</p>',
+                f'<p style="font-size:15px;line-height:1.7;margin:0 0 14px">{synthese}</p>',
+                f'<a href="{url}" style="color:#0b578c;font-size:14px;text-decoration:underline">'
+                "Consulter la source originale</a>",
+                '</div>',
+            ])
+    h.extend([
+        '<p style="font-size:12px;line-height:1.6;color:#718292;margin:27px 0 0">'
+        "FINWATCH AI · Projet universitaire de veille. Les synthèses ont fait l’objet "
+        "d’une validation humaine. Consultez les sources avant toute décision.</p>",
+        '</div></div></body></html>',
+    ])
     return "".join(h)
 
 
