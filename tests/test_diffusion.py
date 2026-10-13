@@ -90,3 +90,10 @@ def test_template_v2_texte_echappe():
     h = diffusion.generer_bulletin([pub(resume_ia="<script>attaque</script>")])
     assert "<script>" not in h
     assert "&lt;script&gt;" in h
+
+
+def test_template_v2_masquer_compteur_et_mentions_universitaires():
+    html = diffusion.generer_bulletin([pub()])
+    assert "publication(s) validée(s)" not in html
+    assert "Projet universitaire de veille" not in html
+    assert "Consultez les sources originales" in html
