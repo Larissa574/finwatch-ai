@@ -16,8 +16,9 @@ HEADERS = [
     "id", "titre", "source", "url", "date_publication",
     "date_collecte", "auteur", "resume_original", "type_document",
     "resume_ia", "categorie", "innovation", "application_financiere",
-    "impact_potentiel", "statut_validation", "valide_par",
-    "date_validation", "statut_envoi", "date_envoi",
+    "impact_potentiel", "probleme_financier", "interet_financier",
+    "statut_validation", "valide_par", "date_validation",
+    "statut_envoi", "date_envoi",
 ]
 
 PROTECTED_FIELDS = {
@@ -40,7 +41,7 @@ def _feuille():
 
     if worksheet.row_values(1)[:len(HEADERS)] != HEADERS:
         raise ValueError(
-            "Les en-têtes Google Sheets ne correspondent pas aux 19 colonnes attendues."
+            "Les en-têtes Google Sheets ne correspondent pas aux 21 colonnes attendues."
         )
 
     return worksheet
@@ -108,7 +109,7 @@ def enregistrer(publication: dict[str, Any]) -> None:
     record["id"] = identifiant
 
     feuille.update(
-        range_name=f"A{ligne_existante}:S{ligne_existante}",
+        range_name=f"A{ligne_existante}:U{ligne_existante}",
         values=[[record[h] for h in HEADERS]],
         value_input_option="RAW",
     )
@@ -128,7 +129,7 @@ def publications_a_diffuser() -> list[dict[str, Any]]:
 
 CHAMPS_ANALYSE_SHEETS = (
     "resume_ia", "categorie", "innovation", "application_financiere",
-    "impact_potentiel",
+    "impact_potentiel", "probleme_financier", "interet_financier",
 )
 
 
@@ -154,7 +155,7 @@ def mettre_a_jour_analyse(analyse: dict[str, Any]) -> None:
         if record["statut_validation"] in ("VALIDE", "REJETE") or record["statut_envoi"] == "ENVOYE":
             raise ValueError("Publication deja validee ou envoyee : mise a jour interdite.")
         record.update(changements)
-        feuille.update(range_name=f"A{ligne_no}:S{ligne_no}",
+        feuille.update(range_name=f"A{ligne_no}:U{ligne_no}",
                        values=[[record[h] for h in HEADERS]], value_input_option="RAW")
         return
     raise KeyError(f"Publication absente de Google Sheets : {identifiant}")
