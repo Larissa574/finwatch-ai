@@ -285,7 +285,7 @@ def decider(signal, score, resume_suffisant):
         if signal == "aucun" and resume_suffisant:
             return "non_pertinent"
         return "incertain"
-    if score >= SEUIL_PERTINENT and signal != "aucun":
+    if score >= SEUIL_PERTINENT and signal == "fort":
         return "pertinent"
     if score <= SEUIL_REJET and signal != "fort":
         return "non_pertinent"
@@ -309,6 +309,8 @@ def filtrer(pub, classificateur, mots=None):
                      f"expressions : {details['expressions']}). ")
     justification += (f"Modèle zero-shot : score {score:.2f}." if score is not None
                       else "Modèle zero-shot non utilisé.")
+    if statut == "incertain" and score is not None and score >= SEUIL_PERTINENT and signal != "fort":
+        justification += " Score eleve sans indices conjoints IA et finance : revue humaine requise."
     motif_rejet = None
     if statut == "non_pertinent":
         if score is not None:
