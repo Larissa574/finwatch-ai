@@ -8,7 +8,7 @@ function table_() {
   if(s.getRange(1,1,1,5).getValues()[0].join('|')!==ENTETES.join('|')) throw Error('En-têtes Abonnes incorrects');
   return s;
 }
-function email_(value) { const s=String(value||'').trim().toLowerCase(); if(s.length>254||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(s)) throw Error('Adresse email invalide'); return s; }
+function email_(value) { const s=String(value||'').trim().toLowerCase(); if(s.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) throw Error('Adresse email invalide'); return s; }
 function token_(email) {
   const bytes=Utilities.computeHmacSha256Signature(email,configuration_('FINWATCH_HMAC_SECRET'));
   return bytes.map(x=>('0'+(x&255).toString(16)).slice(-2)).join('');
