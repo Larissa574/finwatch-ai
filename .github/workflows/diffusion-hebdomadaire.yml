@@ -31,6 +31,17 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: python -m pip install -r requirements.txt
+      - name: Tests automatiques
+        run: python -m pytest tests -q
+      - name: Vérifier les secrets d'envoi
+        if: env.FINWATCH_AUTORISER_ENVOI == 'OUI'
+        run: |
+          test -n "$GOOGLE_SHEET_ID" || exit 1
+          test -n "$GOOGLE_CREDENTIALS_JSON" || exit 1
+          test -n "$FINWATCH_WEBAPP_URL" || exit 1
+          test -n "$FINWATCH_HMAC_SECRET" || exit 1
+          test -n "$SMTP_USER" || exit 1
+          test -n "$SMTP_PASSWORD" || exit 1
       - name: Diffusion (mode simulation par défaut)
         run: |
           if [ "$FINWATCH_AUTORISER_ENVOI" = "OUI" ]; then
