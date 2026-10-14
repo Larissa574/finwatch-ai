@@ -72,7 +72,7 @@ def ajouter_desinscription(bulletin, email):
     return bulletin.replace("</body>", bloc + "</body>")
 
 
-def run(send=False, campagne_test=None):
+def run(send=False, campagne_test=None, test_email=None):
     book = stockage._feuille().spreadsheet
     abonnes = onglet(book, "Abonnes", HEADERS_ABONNES)
     journal = onglet(book, "Journal envois", HEADERS_JOURNAL)
@@ -83,6 +83,12 @@ def run(send=False, campagne_test=None):
         return 0
     ids = sorted(str(p["id"]) for p in pubs)
     campagne = hashlib.sha256("\n".join(ids).encode()).hexdigest()[:20]
+    if test_email:
+        test_email = str(test_email).strip().lower()
+        if test_email != os.environ.get("FINWATCH_TEST_EMAIL", "").strip().lower():
+            raise ValueError("Adresse privee non autorisee.")
+        if not campagne_test:
+            raise ValueError("Campagne de test obligatoire.")
     if campagne_test:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{5,50}", campagne_test):
             raise ValueError("Identifiant de campagne invalide.")
@@ -90,6 +96,8 @@ def run(send=False, campagne_test=None):
     deja = {(str(r["campagne"]), str(r["email"]).lower()) for r in journal.get_all_records()
             if r.get("statut") == "ENVOYE"}
     destinataires = [a for a in emails_actifs(abonnes) if (campagne, a) not in deja]
+    if test_email:
+        destinataires = [a for a in destinataires if a == test_email]
     print("Campagne :", campagne, "Articles :", len(pubs),
           "Destinataires restants :", len(destinataires))
     if not send:
@@ -134,5 +142,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--send", action="store_true")
     parser.add_argument("--campagne-test", help="Identifiant de nouvelle campagne de test")
+    parser.add_argument("--test-email")
     args = parser.parse_args()
-    sys.exit(run(args.send, args.campagne_test))
+    sys.exit(run(args.send, args.campagne_test, args.test_email))
