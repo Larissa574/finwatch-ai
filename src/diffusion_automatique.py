@@ -106,7 +106,7 @@ def run(send=False, campagne_test=None, test_email=None):
     if not destinataires:
         print("Aucun destinataire à servir.")
         return 0
-    if os.getenv("FINWATCH_AUTORISER_ENVOI") != "OUI":
+    if not test_email and os.getenv("FINWATCH_AUTORISER_ENVOI") != "OUI":
         raise RuntimeError("Envoi bloqué : FINWATCH_AUTORISER_ENVOI=OUI requis.")
     if len(destinataires) > int(os.getenv("FINWATCH_MAX_DESTINATAIRES", "50")):
         raise RuntimeError("Trop de destinataires pour cette campagne.")
