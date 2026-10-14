@@ -56,7 +56,6 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.mode_test_prive
         env:
           FINWATCH_AUTORISER_ENVOI: 'NON'
-        env:
           TEST_CAMPAIGN: ${{ inputs.campagne_test }}
         run: |
           python src/diffusion_automatique.py --campagne-test "$TEST_CAMPAIGN" --test-email "$FINWATCH_TEST_EMAIL" --send
