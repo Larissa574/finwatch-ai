@@ -11,7 +11,7 @@ on:
         type: string
         default: 'verification-privee-01'
   schedule:
-    - cron: '0 8 * * 5'
+    - cron: '0 11 * * 6'
 permissions:
   contents: read
 concurrency:
