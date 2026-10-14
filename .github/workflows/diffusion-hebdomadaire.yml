@@ -1,6 +1,15 @@
 name: FINWATCH AI - diffusion abonnés
 on:
   workflow_dispatch:
+    inputs:
+      mode_test_prive:
+        description: 'Envoyer uniquement a FINWATCH_TEST_EMAIL'
+        type: boolean
+        default: false
+      campagne_test:
+        description: 'Identifiant pour test prive'
+        type: string
+        default: 'verification-privee-01'
   schedule:
     - cron: '0 8 * * 5'
 permissions:
@@ -24,6 +33,7 @@ jobs:
       MAIL_FROM: ${{ secrets.SMTP_USER }}
       FINWATCH_AUTORISER_ENVOI: ${{ vars.FINWATCH_AUTORISER_ENVOI }}
       FINWATCH_MAX_DESTINATAIRES: '50'
+      FINWATCH_TEST_EMAIL: ${{ secrets.FINWATCH_TEST_EMAIL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
