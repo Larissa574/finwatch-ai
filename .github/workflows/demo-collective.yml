@@ -1,0 +1,60 @@
+name: FINWATCH AI - demonstration collective
+on:
+  workflow_dispatch:
+    inputs:
+      edition:
+        description: 'Identifiant fixe pour une edition (ex: demo-soir-01)'
+        type: string
+        required: true
+      articles:
+        description: 'IDs exacts des articles valides, separes par virgules'
+        type: string
+        required: true
+      confirmer_envoi:
+        description: 'Cocher pour envoyer reellement; sinon simulation'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: finwatch-envoi
+  cancel-in-progress: false
+jobs:
+  demonstration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+      GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+      FINWATCH_WEBAPP_URL: ${{ secrets.FINWATCH_WEBAPP_URL }}
+      FINWATCH_HMAC_SECRET: ${{ secrets.FINWATCH_HMAC_SECRET }}
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: '465'
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      MAIL_FROM: ${{ secrets.SMTP_USER }}
+      FINWATCH_DEMO_EMAILS: ${{ secrets.FINWATCH_DEMO_EMAILS }}
+      FINWATCH_DEMO_AUTORISER_ENVOI: 'OUI'
+      DEMO_EDITION: ${{ inputs.edition }}
+      DEMO_ARTICLES: ${{ inputs.articles }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Tests automatiques
+        run: python -m pytest tests -q
+      - name: Verifier la liste du groupe
+        run: |
+          test -n "$FINWATCH_DEMO_EMAILS"
+          test -n "$GOOGLE_SHEET_ID"
+          test -n "$GOOGLE_CREDENTIALS_JSON"
+      - name: Simulation ou diffusion vers le groupe autorise
+        run: |
+          if [ "${{ inputs.confirmer_envoi }}" = "true" ]; then
+            python src/diffusion_demo.py --edition "$DEMO_EDITION" --articles "$DEMO_ARTICLES" --send
+          else
+            python src/diffusion_demo.py --edition "$DEMO_EDITION" --articles "$DEMO_ARTICLES"
+          fi
