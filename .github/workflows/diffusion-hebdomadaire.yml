@@ -60,7 +60,6 @@ jobs:
           TEST_CAMPAIGN: ${{ inputs.campagne_test }}
         run: |
           python src/diffusion_automatique.py --campagne-test "$TEST_CAMPAIGN" --test-email "$FINWATCH_TEST_EMAIL" --send
-env-placeholder
       - name: Diffusion (mode simulation par défaut)
         if: github.event_name == 'schedule' || !inputs.mode_test_prive
         run: |
