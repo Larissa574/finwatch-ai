@@ -85,6 +85,8 @@ def run(send=False, campagne_test=None, test_email=None):
     campagne = hashlib.sha256("\n".join(ids).encode()).hexdigest()[:20]
     if test_email:
         test_email = str(test_email).strip().lower()
+        if not os.environ.get("FINWATCH_TEST_EMAIL", "").strip():
+            raise ValueError("FINWATCH_TEST_EMAIL absent.")
         if test_email != os.environ.get("FINWATCH_TEST_EMAIL", "").strip().lower():
             raise ValueError("Adresse privee non autorisee.")
         if not campagne_test:
