@@ -52,7 +52,17 @@ jobs:
           test -n "$FINWATCH_HMAC_SECRET" || exit 1
           test -n "$SMTP_USER" || exit 1
           test -n "$SMTP_PASSWORD" || exit 1
+      - name: Test privé (un seul destinataire)
+        if: github.event_name == 'workflow_dispatch' && inputs.mode_test_prive
+        env:
+          FINWATCH_AUTORISER_ENVOI: 'NON'
+        env:
+          TEST_CAMPAIGN: ${{ inputs.campagne_test }}
+        run: |
+          python src/diffusion_automatique.py --campagne-test "$TEST_CAMPAIGN" --test-email "$FINWATCH_TEST_EMAIL" --send
+env-placeholder
       - name: Diffusion (mode simulation par défaut)
+        if: github.event_name == 'schedule' || !inputs.mode_test_prive
         run: |
           if [ "$FINWATCH_AUTORISER_ENVOI" = "OUI" ]; then
             python src/diffusion_automatique.py --send
