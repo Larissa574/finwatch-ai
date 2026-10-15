@@ -250,13 +250,6 @@ Limites connues :
 - Historique local `data/` non conservé entre les exécutions GitHub Actions ; la déduplication persistante repose sur Google Sheets.
 - Une campagne partiellement envoyée exige une vérification du journal avant toute nouvelle diffusion.
 
-## Équipe et finalité
 
-FINWATCH AI est un projet collaboratif universitaire réalisé par **quatre membres** :
-
-- **Larissa** — coordination, recherche des sources et collecte.
-- **Jean-Arthur** — filtrage, classification et synthèse IA.
-- **Sosthene** — intégration et stockage Google Sheets.
-- **Charbel** — newsletter et diffusion.
 
 Le projet met en pratique une chaîne de **veille technologique assistée par IA**, où l'automatisation facilite le suivi de l'information sans remplacer l'analyse critique et la validation humaine.
